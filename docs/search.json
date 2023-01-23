@@ -2,9 +2,9 @@
   {
     "objectID": "index.html",
     "href": "index.html",
-    "title": "Blog",
+    "title": "Mi primer blog",
     "section": "",
-    "text": "Post With Code\n\n\n\n\n\n\n\nnews\n\n\ncode\n\n\nanalysis\n\n\n\n\n\n\n\n\n\n\n\nJan 17, 2023\n\n\nHarlow Malloc\n\n\n\n\n\n\n  \n\n\n\n\nWelcome To My Blog\n\n\n\n\n\n\n\nnews\n\n\n\n\n\n\n\n\n\n\n\nJan 14, 2023\n\n\nTristan O’Malley\n\n\n\n\n\n\nNo matching items"
+    "text": "Incidentes viales\n\n\n\nspatial statistics\n\n\ncode\n\n\nanalysis\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nHomicidios en Medellín entre 2003 y 2022\n\n\n\ntime series\n\n\ncode\n\n\nanalysis\n\n\n\n\n\n\n\n\n\n\nJan 1, 2022\n\n\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "about.html",
@@ -14,17 +14,101 @@
     "text": "About this blog"
   },
   {
-    "objectID": "posts/post-with-code/index.html",
-    "href": "posts/post-with-code/index.html",
-    "title": "Post With Code",
+    "objectID": "posts/Time Series/index.html",
+    "href": "posts/Time Series/index.html",
+    "title": "Homicidios en Medellín entre 2003 y 2022",
     "section": "",
-    "text": "This is a post with executable code.\n\n1 + 1\n\n[1] 2"
+    "text": "La base de datos homicidio.csv encontrada en el portal MEData contiene información acerca de los homicidios registrados por la mesa de revisión y validación de casos de homicidio en la ciudad de Medellín. Dicha base de datos en crudo contiene 19169 observaciones de 36 variables.\n\n\n\n\n\n\n\n\nHomicidios Medellín\n \n  \n    fecha_hecho \n    cantidad \n  \n \n\n  \n    2019-04-23T07:30:00.000-05:00 \n    1 \n  \n  \n    2019-05-11T19:51:00.000-05:00 \n    1 \n  \n  \n    2019-05-11T21:36:00.000-05:00 \n    1 \n  \n  \n    2019-05-11T22:03:00.000-05:00 \n    1 \n  \n  \n    2019-05-12T17:40:00.000-05:00 \n    1 \n  \n\n\n\n\n\n\nEl interés se centra en estudiar el comportamiento de este suceso a lo largo del tiempo para determinar si existen épocas del año donde el número de homicidios aumente o muestre patrones."
   },
   {
-    "objectID": "posts/welcome/index.html",
-    "href": "posts/welcome/index.html",
-    "title": "Welcome To My Blog",
+    "objectID": "posts/Spatial/index.html",
+    "href": "posts/Spatial/index.html",
+    "title": "Incidentes viales",
     "section": "",
-    "text": "This is the first post in a Quarto blog. Welcome!\n\nSince this post doesn’t specify an explicit image, the first image in the post will be used in the listing page of posts."
+    "text": "En general, un proceso puntual es un proceso estocástico en el que observamos las ubicaciones de algunos eventos de interés dentro de una región delimitada. Diggle (2003) define un proceso puntual como un “mecanismo estocástico que genera un conjunto de eventos contables”. Diggle (2003) y Möller and Waagepetersen (2003) proporcionan definiciones adecuadas de los diferentes tipos de procesos de puntos y sus propiedades principales. Las ubicaciones de los eventos generados por un proceso de puntos en el área del estudio A se llamarán patrones de puntos.\nLa idea del análisis es verificar si los puntos presentan algún tipo de patrón espacial:\n\nEn el patrón aleatorio los puntos se distribuyen aleatoriamente en el espacio\nEn el patrón regular existe una distancia media entre los puntos que tiende a ser constante.\nEn el patrón agregado existen aglomeraciones de puntos en el espacio.\n\nEl análisis estadístico de los patrones de distribución de puntos propone como modelo teórico el modelo de aleatoriedad espacial completa, en este modelo se asume que los puntos son independientes y tienen una distribución de probabilidad uniforme sobre el área de estudio.\nBajo aleatoriedad espacial completa (CSR) se considera que los eventos ocurridos en cada área \\(S_i\\) del espacio en estudio son no correlacionados y siguen una distribución Poisson.\nEn el presente análisis el evento espacial de interés son los incidentes viales con motos presentados en la ciudad de Medellín durante el año 2021 y registrados por la Secretaría de Movilidad de la Alcaldía de Medellín. Los datos sobre este evento fueron obtenidos en una base de datos del portal de datos abiertos de la alcaldía de Medellín (MEData). Dicha base de datos contiene información de incidentes viales de varios años y registra variables de interés como la ubicación de cada incidente vial (dada en dirección y no en localización geográfica y geocodificada para el presente análisis), la gravedad del incidente de acuerdo con el Informe Policial de incidentes de Tránsito y correspondiente al resultado más grave presentado en el incidente: daños materiales “Sólo daños”, incidente con heridos “Herido”, incidente con muertos “Muerto” y el sitio de la vía donde ocurrió el incidente: Cicloruta, Glorieta, Interseccion, Lote o Predio, Paso a Nivel, Paso Elevado, Paso Inferior, Pontón, Puente, Tramo de via, Tunel, Via peatonal.\nPara tratabilidad de la base de datos, como se mencionó las direcciones de los incidentes fueron geocodificadas a través de la herramienta de geocodificación que brinda el Portal Geográfico del municipio de Medellín y através del software Qgis fue convertido este registro en un archivo shapefile.\n\nlibrary(readxl)\nlibrary(sf)\nlibrary(geoR)\nlibrary(sp)\nrequire(raster)\nrequire(rgdal)\nrequire(rgeos)\nrequire(ggplot2)\nlibrary(dplyr)\nlibrary(mapview)\nlibrary(maptools)\nlibrary(leaflet)\nlibrary(spatstat)\n#library(GISTools)\nlibrary(rgl)\n\nEl área de estudio entonces es el municipio de Medellín, cuyo shapefile fue obtenido del portal web Metabolism of Cities Data Hub (https://data.metabolismofcities.org/dashboards/medellin/context/35257/) y se muestra acontinuación:\n\n# Shapefile Medellín:\nplot(shapefile(\"archivos/comunasmedellin.shp\"), main = \"Shapefile Medellín\")\n\n\n\n\n\n\n\nmedellin <- st_read(\"archivos/comunasmedellin.shp\")\n\nReading layer `comunasmedellin' from data source \n  `C:\\Users\\Veronica\\Documents\\UN\\Blog\\posts\\Spatial\\archivos\\comunasmedellin.shp' \n  using driver `ESRI Shapefile'\nSimple feature collection with 17 features and 7 fields\nGeometry type: MULTIPOLYGON\nDimension:     XY\nBounding box:  xmin: -75.63243 ymin: 6.175719 xmax: -75.52478 ymax: 6.312849\nGeodetic CRS:  WGS 84\n\n#plot(medellin, main = \"Incidentes viales con motos - Medellín\")\n\nEl archivo shapefile con los datos sobre los incidentes viales en Medellín obtenido con el software Qgis se lee y las localizaciones del evento de interés discriminadas de acuerdo a la gravedad del incidente se muestran en el siguiente mapa:\n\nincidentes <- st_read(\"archivos/solo_muertos.shp\") #lon lat\n\nReading layer `solo_muertos' from data source \n  `C:\\Users\\Veronica\\Documents\\UN\\Blog\\posts\\Spatial\\archivos\\solo_muertos.shp' \n  using driver `ESRI Shapefile'\nSimple feature collection with 97 features and 21 fields\nGeometry type: POINT\nDimension:     XY\nBounding box:  xmin: -75.62176 ymin: 6.19113 xmax: -75.53062 ymax: 6.310292\nGeodetic CRS:  WGS 84\n\n\n\nm1 <- mapView(medellin, col.regions = \"gray\")\nm2 <- mapView(incidentes, col.regions = \"red\")\nm1 + m2\n\n\n\n\n\n\nPosteriormente se proyecta el conjunto de datos de incidentes al Sistema de Referencia Terrestre Europeo de 1989 (ETRS89/UTM zona 18N) para su posterior utilización. Para ello, se utiliza la función st_transform() proporcionando el identificador EPSG para la zona 18N de ERTS89/UTM para Colombia, que es 3116.\n\nmedellin <- st_transform(medellin, 3116)\nincidentes <- st_transform(incidentes, 3116)\n\nCon el fin de establecer la ventana en el polígono de Medellín, se convierte el objeto medellin en un objeto Spatial, que a su vez se convierte en un objeto owin utilizando la función as(). Posteriormente, se asigna el objeto owin a una variable denominada win, con el objetivo de crear el patrón espacial de puntos, argumento de la función ppp():\n\nwin <-as(as(medellin, 'Spatial'), 'owin')\n\nSe utiliza la función st_coordinates() para extraer las coordenadas xy en forma de objeto matriz del objeto incidentes y luego se construye un objeto ppp, llamado ppp.locations. Se muestran las localizaciones en el shape de Medellín.\n\nppp.locations <- ppp(x = st_coordinates(incidentes)[,1],\n                     y = st_coordinates(incidentes)[,2],\n                     window = win)\n\nplot(ppp.locations)\n\n\n\n\n\n\n\n\n\ncoordinate.units <- c(\"metre\", \"metres\")\nunitname(ppp.locations) <- coordinate.units\n\nDado que se observan puntos fuera de la ventana de observación de interés, se procede a excluirlos:\n\nsp.locations <- as(incidentes, \"Spatial\")\nsp.border <- as(medellin, \"Spatial\")\ni <- gIntersects(sp.locations, sp.border , byid=TRUE)\n\nppp.locations <- as.ppp(ppp.locations)\nplot(ppp.locations)"
+  },
+  {
+    "objectID": "posts/Spatial/index.html#intensidad",
+    "href": "posts/Spatial/index.html#intensidad",
+    "title": "Incidentes viales",
+    "section": "Intensidad:",
+    "text": "Intensidad:\nLa intensidad es el número previsto de puntos por unidad de superficie y puede ser constante (uniforme) o puede variar de un lugar a otro (no uniforme o no homogénea). Para evaluar las posibilidades anteriores se utiliza el conteo por cuadrantes, es decir, se divide la región de estudio en cuadrantes y si los puntos tienen una intensidad uniforme y son completamente aleatorios, los recuentos de los cuadrantes deberían ser números aleatorios de Poisson con media constante. Esto puede ser probado usando el estadístico \\(\\chi^2\\) de bondad de ajuste dado por:\nPara esto, se utilizan las funciones quadratcount() y quadrat.test() del paquete spatstat en R:\n\n# numero de incidentes por cuadrante \nqc.loc <- quadratcount(ppp.locations, nx=4, ny=4)\nplot(ppp.locations, pch=3, cex=0.6, main = \"Número de incidentes viales por cuadrante\")\nplot(qc.loc, add=T, textargs = list(col='red'))\n\n\n\n\n\n\n\n\n\nquadrat.test(ppp.locations)\n\n\n    Chi-squared test of CSR using quadrat counts\n\ndata:  ppp.locations\nX2 = 57.715, df = 21, p-value = 5.628e-05\nalternative hypothesis: two.sided\n\nQuadrats: 22 tiles (irregular windows)\n\n\nDe donde se concluye con una significancia del 5% que no hay aleatoriedad espacial y que la intensidad no es constante.\nSe hace la estimación del kernel con la función density.ppp() del paquete spatstat.\n\nplot(density.ppp(ppp.locations), main = \"Mapa de densidad de incidentes viales\")"
+  },
+  {
+    "objectID": "posts/Spatial/index.html#ajustando-una-función-de-ancho-de-banda",
+    "href": "posts/Spatial/index.html#ajustando-una-función-de-ancho-de-banda",
+    "title": "Incidentes viales",
+    "section": "Ajustando una función de ancho de banda",
+    "text": "Ajustando una función de ancho de banda\n\nplot(density(ppp.locations, sigma = bw.scott.iso(ppp.locations)), main = \"\")\n\n\n\n\n\n\n\nattr(density(ppp.locations, sigma = bw.scott.iso(ppp.locations)),\"sigma\")\n\n   sigma \n1089.145 \n\nplot(density(ppp.locations, sigma = bw.scott(ppp.locations)), main = \"\")\n\n\n\n\n\n\n\n\nDe acuerdo con este método, el ancho de banda óptimo para la estimación no paramétrica de la densidad del patrón puntual es 1089.145 .\n\nProbando con distintos anchos de banda:\n\npar(mfrow=c(2,2),mar=c(0,0,1,2))\nsigma <- c(500,1000, 2500, 5000)\ndata <- ppp.locations\nmain <- 'Locations'\nfor (j in 1:4){\n  ds <- density.ppp(data, sigma=sigma[j])\n  plot(ds, \n       main = paste0(main, ', sigma: ', sigma[j]))\n  plot(data, add=T, cex=0.01, regular=F)\n}\n\n\n\n\n\n\n\n\n\n\nReferencias:\n\nTHE METABOLISM OF CITIES DATA HUB, Límite Municipio de Medellín, metabolismofcitieshttps://data.metabolismofcities.org/dashboards/medellin/context/35257/\nFREIE UNIVERSITÄT BERLIN, Interactions in Point Pattern Analysis, https://www.geo.fu-berlin.de/en/v/soga/Geodata-analysis/Spatial-Point-patterns/Analysis-of-spatial-point-patterns/Interactions/index.html\nAlcaldía de Medellín, Incidentes Viales con Motos, http://medata.gov.co/dataset/incidentes-viales-con-motos/resource/340e6a8b-156a-4335-8d3b-4675204ee2e1#{}"
+  },
+  {
+    "objectID": "posts/Time Series/index.html#marco-teórico",
+    "href": "posts/Time Series/index.html#marco-teórico",
+    "title": "Homicidios en Medellín entre 2003 y 2022",
+    "section": "Marco teórico",
+    "text": "Marco teórico\nLa base de datos homicidio.csv encontrada en el portal MEData contiene información acerca de los homicidios registrados por la mesa de revisión y validación de casos de homicidio en la ciudad de Medellín. Dicha base de datos en crudo contiene 19169 observaciones de 36 variables.\n\n\n\n\n\n\n\n\nHomicidios Medellín\n \n  \n    fecha_hecho \n    cantidad \n  \n \n\n  \n    2019-04-23T07:30:00.000-05:00 \n    1 \n  \n  \n    2019-05-11T19:51:00.000-05:00 \n    1 \n  \n  \n    2019-05-11T21:36:00.000-05:00 \n    1 \n  \n  \n    2019-05-11T22:03:00.000-05:00 \n    1 \n  \n  \n    2019-05-12T17:40:00.000-05:00 \n    1 \n  \n\n\n\n\n\n\nEl interés se centra en estudiar el comportamiento de este suceso a lo largo del tiempo para determinar si existen épocas del año donde el número de homicidios aumente o muestre patrones."
+  },
+  {
+    "objectID": "posts/Time Series/index.html#lectura-y-limpieza-de-la-base-de-datos",
+    "href": "posts/Time Series/index.html#lectura-y-limpieza-de-la-base-de-datos",
+    "title": "Homicidios en Medellín entre 2003 y 2022",
+    "section": "Lectura y limpieza de la base de datos:",
+    "text": "Lectura y limpieza de la base de datos:\n\n\n\nAdecuación de la fecha:\n\n\nhomicidios$fecha_hecho <- substr(homicidios$fecha_hecho, 0, 7)\n\n\n\n\nConteo por mes de casos:\n\n\nresumen_hom <- homicidios %>% group_by(fecha_hecho) %>% summarise(casos=sum(cantidad))\n\n\n\n\nGeneración de fechas:\n\n\nresumen_hom$fecha <- seq(as.Date(\"2003-01-01\"), by=\"month\", len=236)"
+  },
+  {
+    "objectID": "posts/Time Series/index.html#serie-de-tiempo-casos-de-homicidio-en-medellín",
+    "href": "posts/Time Series/index.html#serie-de-tiempo-casos-de-homicidio-en-medellín",
+    "title": "Homicidios en Medellín entre 2003 y 2022",
+    "section": "Serie de tiempo: Casos de homicidio en Medellín:",
+    "text": "Serie de tiempo: Casos de homicidio en Medellín:"
+  },
+  {
+    "objectID": "posts/Time Series/index.html#section-5",
+    "href": "posts/Time Series/index.html#section-5",
+    "title": "Homicidios en Medellín entre 2003 y 2022",
+    "section": "",
+    "text": "En los últimos gráficos se observa que la serie no presenta estacionalidad, es decir, los meses no están relacionados con el número de homicidios. Sin embargo, dada la escala y la presencia de outliers, no es fácil de manera gráfica detectar estacionalidad, por lo que previamente se ha convertido la serie en un objeto ts con frecuencia 12 y se aplica la función auto.arima."
+  },
+  {
+    "objectID": "posts/Time Series/index.html#modelo-a-utilizar-y-alternativas",
+    "href": "posts/Time Series/index.html#modelo-a-utilizar-y-alternativas",
+    "title": "Homicidios en Medellín entre 2003 y 2022",
+    "section": "Modelo a utilizar y alternativas",
+    "text": "Modelo a utilizar y alternativas\n\n\n\nmod <- auto.arima(homicidio, stepwise = FALSE, approximation = FALSE)\nsummary(mod)\n\nSeries: homicidio \nARIMA(0,1,1)(1,0,0)[12] \n\nCoefficients:\n          ma1    sar1\n      -0.3954  0.1719\ns.e.   0.0596  0.0655\n\nsigma^2 = 290:  log likelihood = -998.93\nAIC=2003.86   AICc=2003.97   BIC=2014.24\n\nTraining set error measures:\n                    ME     RMSE      MAE       MPE     MAPE      MASE\nTraining set -1.106916 16.92146 11.53901 -4.068618 16.46218 0.4204877\n                    ACF1\nTraining set 0.004800322\n\n\n\n\nLa función auto.arima arrojó como resultado un modelo \\(SARIMA(0,1,1) \\times (1,0,0)_{12}\\)."
+  },
+  {
+    "objectID": "posts/Time Series/index.html#backtesting",
+    "href": "posts/Time Series/index.html#backtesting",
+    "title": "Homicidios en Medellín entre 2003 y 2022",
+    "section": "Backtesting",
+    "text": "Backtesting\nSe procede a partir la base de datos en 2: la primera parte hasta agosto de 2021 para entrenamiento y el último año para testeo:\n\ntrain <- window(homicidio, start = c(2003, 1), end = c(2021,8))\ntest <- window(homicidio, start = c(2021,9))"
+  },
+  {
+    "objectID": "posts/Time Series/index.html#predicciones-para-comparar-modelos",
+    "href": "posts/Time Series/index.html#predicciones-para-comparar-modelos",
+    "title": "Homicidios en Medellín entre 2003 y 2022",
+    "section": "Predicciones para comparar modelos:",
+    "text": "Predicciones para comparar modelos:\n\nPredicciones modelo 1:\n\n\nnpred <- 12\nfore1 <- forecast(modelo_train1, h=npred)\n\n\n\n\nPredicciones modelo 2:\n\n\nfore2 <- predict(modelo_train2, 12, newxreg = xreg2[225:236,])\n\n\n\n\nPredicciones modelo 3:\n\n\nfore1_log <- forecast(modelo_train_log, h=npred)"
+  },
+  {
+    "objectID": "posts/Time Series/index.html#medidas-de-error",
+    "href": "posts/Time Series/index.html#medidas-de-error",
+    "title": "Homicidios en Medellín entre 2003 y 2022",
+    "section": "Medidas de error:",
+    "text": "Medidas de error:\n\n# Modelo 1:\naccuracy(fore1$mean, test)\n\n               ME     RMSE      MAE      MPE     MAPE       ACF1 Theil's U\nTest set 1.929462 5.454308 4.101654 3.577428 12.22427 -0.3554528 0.7842597\n\n# Modelo 2:\naccuracy(fore2$pred, test)\n\n               ME     RMSE      MAE      MPE     MAPE      ACF1 Theil's U\nTest set 2.260663 5.598288 4.388215 4.579615 13.01895 -0.306108 0.8010046\n\n# Modelo 3:\naccuracy(exp(fore1_log$mean), test)\n\n               ME     RMSE      MAE      MPE     MAPE       ACF1 Theil's U\nTest set 1.116842 5.226694 4.006872 1.008613 12.26614 -0.3402633 0.7417582\n\n\nDonde se obtiene que las medidas de errores son menores en el modelo 3, lo que indica que es el modelo más adecuado de los propuestos para modelar la serie de tiempo de homicidios en Medellín en la ventana de tiempo considerada."
+  },
+  {
+    "objectID": "posts/Time Series/index.html#predicciones",
+    "href": "posts/Time Series/index.html#predicciones",
+    "title": "Homicidios en Medellín entre 2003 y 2022",
+    "section": "Predicciones",
+    "text": "Predicciones\nSe realizan predicciones para el próximo año con el modelo elegido como el más adecuado:\n\nfore_final <- forecast(modelo_train_log, h=npred)\nexp(fore_final$mean)\n\n          Jan      Feb      Mar      Apr      May      Jun      Jul      Aug\n2021                                                                        \n2022 32.06591 30.61652 31.46605 32.47888 32.34439 33.22832 30.97162 31.30591\n          Sep      Oct      Nov      Dec\n2021 31.92160 30.79685 30.43024 30.97162\n2022                                    \n\n\nEn promedio, se espera para diciembre de este año 30 homicidios en la ciudad de Medellín y para los meses de marzo a julio del próximo año se esperan aproximandamente 29 homicidios en la ciudad."
+  },
+  {
+    "objectID": "posts/Time Series/index.html#conclusiones-y-recomendaciones",
+    "href": "posts/Time Series/index.html#conclusiones-y-recomendaciones",
+    "title": "Homicidios en Medellín entre 2003 y 2022",
+    "section": "Conclusiones y recomendaciones",
+    "text": "Conclusiones y recomendaciones\n\nEl efecto del comportamiento tan marcado en el número de homicidios que se presentó a inicios de 2003, finales de 2009 e inicios de 2010 no influye en la cantidad de homicidios que se puedan presentar en los próximos años.\nLos tres modelos presentado no parecen mostrar diferencias en las predicciones, pero sí lo hacen en los intervalos de predicción."
   }
 ]

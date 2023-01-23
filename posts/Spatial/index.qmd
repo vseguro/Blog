@@ -1,0 +1,176 @@
+---
+title: "Incidentes viales"
+toc: true
+toc-location: left
+categories: [spatial statistics, code, analysis]
+image: "image.jpg"
+editor: source
+---
+
+### Procesos puntuales.
+
+En general, un proceso puntual es un proceso estocástico en el que observamos las ubicaciones de algunos eventos de interés dentro de una región delimitada. Diggle (2003) define un proceso puntual como un "mecanismo estocástico que genera un conjunto de eventos contables". Diggle (2003) y Möller and Waagepetersen (2003) proporcionan definiciones adecuadas de los diferentes tipos de procesos de puntos y sus propiedades principales. Las ubicaciones de los eventos generados por un proceso de puntos en el área del estudio A se llamarán patrones de puntos.
+
+La idea del análisis es verificar si los puntos presentan algún tipo de patrón espacial:
+
+-   En el patrón aleatorio los puntos se distribuyen aleatoriamente en el espacio
+-   En el patrón regular existe una distancia media entre los puntos que tiende a ser constante.
+-   En el patrón agregado existen aglomeraciones de puntos en el espacio.
+
+El análisis estadístico de los patrones de distribución de puntos propone como modelo teórico el modelo de aleatoriedad espacial completa, en este modelo se asume que los puntos son independientes y tienen una distribución de probabilidad uniforme sobre el área de estudio.
+
+Bajo aleatoriedad espacial completa (CSR) se considera que los eventos ocurridos en cada área $S_i$ del espacio en estudio son no correlacionados y siguen una distribución Poisson.
+
+En el presente análisis el evento espacial de interés son los incidentes viales con motos presentados en la ciudad de Medellín durante el año 2021 y registrados por la Secretaría de Movilidad de la Alcaldía de Medellín. Los datos sobre este evento fueron obtenidos en una base de datos del portal de datos abiertos de la alcaldía de Medellín (MEData). Dicha base de datos contiene información de incidentes viales de varios años y registra variables de interés como la ubicación de cada incidente vial (dada en dirección y no en localización geográfica y geocodificada para el presente análisis), la gravedad del incidente de acuerdo con el Informe Policial de incidentes de Tránsito y correspondiente al resultado más grave presentado en el incidente: daños materiales "Sólo daños", incidente con heridos "Herido", incidente con muertos "Muerto" y el sitio de la vía donde ocurrió el incidente: Cicloruta, Glorieta, Interseccion, Lote o Predio, Paso a Nivel, Paso Elevado, Paso Inferior, Pontón, Puente, Tramo de via, Tunel, Via peatonal.
+
+Para tratabilidad de la base de datos, como se mencionó las direcciones de los incidentes fueron geocodificadas a través de la herramienta de geocodificación que brinda el Portal Geográfico del municipio de Medellín y através del software Qgis fue convertido este registro en un archivo *shapefile*.
+
+```{r, warning=FALSE, message=FALSE}
+library(readxl)
+library(sf)
+library(geoR)
+library(sp)
+require(raster)
+require(rgdal)
+require(rgeos)
+require(ggplot2)
+library(dplyr)
+library(mapview)
+library(maptools)
+library(leaflet)
+library(spatstat)
+#library(GISTools)
+library(rgl)
+```
+
+El área de estudio entonces es el municipio de Medellín, cuyo *shapefile* fue obtenido del portal web Metabolism of Cities Data Hub (https://data.metabolismofcities.org/dashboards/medellin/context/35257/) y se muestra acontinuación:
+
+```{r, message=FALSE, warning=FALSE, fig.align='center'}
+# Shapefile Medellín:
+plot(shapefile("archivos/comunasmedellin.shp"), main = "Shapefile Medellín")
+medellin <- st_read("archivos/comunasmedellin.shp")
+#plot(medellin, main = "Incidentes viales con motos - Medellín")
+```
+
+El archivo shapefile con los datos sobre los incidentes viales en Medellín obtenido con el software Qgis se lee y las localizaciones del evento de interés discriminadas de acuerdo a la gravedad del incidente se muestran en el siguiente mapa:
+
+```{r}
+incidentes <- st_read("archivos/solo_muertos.shp") #lon lat
+```
+
+```{r, warning=FALSE, message=FALSE, fig.align='center'}
+m1 <- mapView(medellin, col.regions = "gray")
+m2 <- mapView(incidentes, col.regions = "red")
+m1 + m2
+```
+
+Posteriormente se proyecta el conjunto de datos de incidentes al Sistema de Referencia Terrestre Europeo de 1989 (ETRS89/UTM zona 18N) para su posterior utilización. Para ello, se utiliza la función *st_transform()* proporcionando el identificador EPSG para la zona 18N de ERTS89/UTM para Colombia, que es 3116.
+
+```{r, warning=FALSE, message=FALSE}
+medellin <- st_transform(medellin, 3116)
+incidentes <- st_transform(incidentes, 3116)
+```
+
+Con el fin de establecer la ventana en el polígono de Medellín, se convierte el objeto *medellin* en un objeto *Spatial*, que a su vez se convierte en un objeto *owin* utilizando la función *as()*. Posteriormente, se asigna el objeto *owin* a una variable denominada *win*, con el objetivo de crear el patrón espacial de puntos, argumento de la función *ppp()*:
+
+```{r, warning=FALSE, message=FALSE}
+win <-as(as(medellin, 'Spatial'), 'owin')
+```
+
+Se utiliza la función *st_coordinates()* para extraer las coordenadas xy en forma de objeto matriz del objeto *incidentes* y luego se construye un objeto *ppp*, llamado *ppp.locations*. Se muestran las localizaciones en el shape de Medellín.
+
+```{r, warning=FALSE, message=FALSE, fig.align='center'}
+ppp.locations <- ppp(x = st_coordinates(incidentes)[,1],
+                     y = st_coordinates(incidentes)[,2],
+                     window = win)
+
+plot(ppp.locations)
+
+```
+
+```{r, warning=FALSE, message=FALSE}
+coordinate.units <- c("metre", "metres")
+unitname(ppp.locations) <- coordinate.units
+```
+
+Dado que se observan puntos fuera de la ventana de observación de interés, se procede a excluirlos:
+
+```{r, warning=FALSE, message=FALSE, fig.align='center'}
+sp.locations <- as(incidentes, "Spatial")
+sp.border <- as(medellin, "Spatial")
+i <- gIntersects(sp.locations, sp.border , byid=TRUE)
+
+ppp.locations <- as.ppp(ppp.locations)
+plot(ppp.locations)
+```
+
+### Análisis de patrones de puntos espaciales:
+
+El análisis de los patrones puntuales se centra en la distribución espacial de los eventos observados en el espacio de interés y hace inferencias sobre el proceso subyacente que los generó. En particular, hay dos cuestiones principales de interés (Bivand et al. 2008):
+
+-   La distribución de los eventos en el espacio, también denominada propiedad de primer orden, medida por la intensidad del patrón puntual.
+
+-   La existencia de posibles interacciones entre los eventos, también denotada como propiedad de segundo orden, medida por la tendencia de los eventos a aparecer agrupados, de forma independiente, o espaciados regularmente.
+
+## Intensidad:
+
+La intensidad es el número previsto de puntos por unidad de superficie y puede ser constante (uniforme) o puede variar de un lugar a otro (no uniforme o no homogénea). Para evaluar las posibilidades anteriores se utiliza el conteo por cuadrantes, es decir, se divide la región de estudio en cuadrantes y si los puntos tienen una intensidad uniforme y son completamente aleatorios, los recuentos de los cuadrantes deberían ser números aleatorios de Poisson con media constante. Esto puede ser probado usando el estadístico $\chi^2$ de bondad de ajuste dado por:
+
+```{=tex}
+\begin{center}
+$\chi^2 = \sum \frac{(observado - esperado)^2}{esperado}$
+\end{center}
+```
+Para esto, se utilizan las funciones quadratcount() y quadrat.test() del paquete spatstat en R:
+
+```{r, warning=FALSE, message=FALSE, fig.align='center'}
+# numero de incidentes por cuadrante 
+qc.loc <- quadratcount(ppp.locations, nx=4, ny=4)
+plot(ppp.locations, pch=3, cex=0.6, main = "Número de incidentes viales por cuadrante")
+plot(qc.loc, add=T, textargs = list(col='red'))
+
+```
+
+```{r, warning=FALSE, message=FALSE}
+quadrat.test(ppp.locations)
+```
+
+De donde se concluye con una significancia del 5% que no hay aleatoriedad espacial y que la intensidad no es constante.
+
+Se hace la estimación del kernel con la función density.ppp() del paquete spatstat.
+
+```{r, warning=FALSE, message=FALSE, fig.align='center'}
+plot(density.ppp(ppp.locations), main = "Mapa de densidad de incidentes viales")
+```
+
+## Ajustando una función de ancho de banda
+
+```{r, warning=FALSE, message=FALSE, fig.align='center'}
+plot(density(ppp.locations, sigma = bw.scott.iso(ppp.locations)), main = "")
+attr(density(ppp.locations, sigma = bw.scott.iso(ppp.locations)),"sigma")
+plot(density(ppp.locations, sigma = bw.scott(ppp.locations)), main = "")
+```
+
+De acuerdo con este método, el ancho de banda óptimo para la estimación no paramétrica de la densidad del patrón puntual es 1089.145 .
+
+### Probando con distintos anchos de banda:
+
+```{r, fig.align='center', warning=FALSE, message=FALSE}
+par(mfrow=c(2,2),mar=c(0,0,1,2))
+sigma <- c(500,1000, 2500, 5000)
+data <- ppp.locations
+main <- 'Locations'
+for (j in 1:4){
+  ds <- density.ppp(data, sigma=sigma[j])
+  plot(ds, 
+       main = paste0(main, ', sigma: ', sigma[j]))
+  plot(data, add=T, cex=0.01, regular=F)
+}
+
+```
+
+### Referencias:
+
+-   THE METABOLISM OF CITIES DATA HUB, Límite Municipio de Medellín, metabolismofcitieshttps://data.metabolismofcities.org/dashboards/medellin/context/35257/
+-   FREIE UNIVERSITÄT BERLIN, Interactions in Point Pattern Analysis, https://www.geo.fu-berlin.de/en/v/soga/Geodata-analysis/Spatial-Point-patterns/Analysis-of-spatial-point-patterns/Interactions/index.html
+-   Alcaldía de Medellín, Incidentes Viales con Motos, http://medata.gov.co/dataset/incidentes-viales-con-motos/resource/340e6a8b-156a-4335-8d3b-4675204ee2e1#{}

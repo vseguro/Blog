@@ -10,5 +10,11 @@
   },
   "posts/welcome/index.qmd": {
     "index.html": "d3882e86"
+  },
+  "posts/Time Series/index.qmd": {
+    "index.html": "fc6aa81e"
+  },
+  "posts/Spatial/index.qmd": {
+    "index.html": "4267762b"
   }
 }

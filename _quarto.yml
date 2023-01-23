@@ -3,17 +3,20 @@ project:
   output-dir: docs
 
 website:
-  title: "Blog"
+  title: "Mi primer blog"
   navbar:
-    left:
+    right:
       - about.qmd
       - icon: github
-        href: https://github.com/
-      - icon: twitter
-        href: https://twitter.com
+        href: https://github.com/vseguro/Blog
+      - icon: linkedin
+        href: www.linkedin.com/in/veronica-seguro
+        
 format:
   html:
-    theme: cosmo
+    theme:
+      light: pulse
+      dark: darkly
     css: styles.css
 
 editor: visual
