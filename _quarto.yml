@@ -14,9 +14,9 @@ website:
         
 format:
   html:
-    theme:
+    theme: 
       light: pulse
-      dark: darkly
+      dark:  theme.scss
     css: styles.css
 
 editor: visual

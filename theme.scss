@@ -1,0 +1,32 @@
+/*-- scss:defaults --*/
+
+$red: #dc3545 !default;
+$red-800: shade-color($red, 60%) !default;
+$yellow:  #ffc107 !default;
+$yellow-700: shade-color($yellow, 40%) !default;
+
+$primary: $red-800 !default; /* Color de la barra de navegacion */
+$body-color: $yellow-700; /*Color de la letra*/
+$body-bg: black; /*Color fondo*/
+$navbar-hl: #390234; /*color links barra de navegación*/
+$navbar-fg: green; /*Color letra barra de navegación*/
+$margin-top: 100px;
+$margin-left: 100px;
+$margin-right: 100px;
+
+
+/*-- scss:rules --*/
+#title-block-header.quarto-title-block.default .quarto-title .title {
+  font-family: "Gill Sans Extrabold", $headings-font-family;
+  font-size: 80px;
+}
+
+.navbar-dark {
+    font-family: "Lucida Console";
+}
+
+#quarto-content{
+  font-family: "Lucida Console";
+  background-color: #03A9F4;
+}
+
